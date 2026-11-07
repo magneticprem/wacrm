@@ -397,10 +397,10 @@ export function MessageBubble({
     >
       <div
         className={cn(
-          "relative rounded-2xl px-3.5 py-2 transition-shadow shadow-[0_1px_0.5px_rgba(0,0,0,0.13)]",
+          "relative max-w-[85%] sm:max-w-[75%] px-3 py-1.5 transition-shadow shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]",
           isAgent
-            ? "rounded-tr-xs bg-[var(--wa-outgoing-bubble,#005c4b)] text-[var(--wa-outgoing-text,#e9edef)] border border-emerald-900/10 dark:border-emerald-500/10"
-            : "rounded-tl-xs bg-[var(--wa-incoming-bubble,#202c33)] text-[var(--wa-incoming-text,#e9edef)] border border-black/5 dark:border-white/5",
+            ? "rounded-lg rounded-tr-none bg-[var(--wa-outgoing-bubble,#005c4b)] text-[var(--wa-outgoing-text,#e9edef)] border border-emerald-900/10 dark:border-emerald-500/10"
+            : "rounded-lg rounded-tl-none bg-[var(--wa-incoming-bubble,#202c33)] text-[var(--wa-incoming-text,#e9edef)] border border-black/5 dark:border-white/5",
         )}
       >
         {reply && (

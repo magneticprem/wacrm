@@ -977,16 +977,20 @@ export function MessageThread({
   // pattern under the user's eye.
   if (!conversation || !contact) {
     return (
-      <div className={cn("flex flex-1 flex-col items-center justify-center", DOODLE_BG_CLASSES)}>
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-          <MessageSquare className="h-8 w-8 text-muted-foreground" />
+      <div className="flex flex-1 flex-col items-center justify-center bg-[var(--wa-search-bg)] border-b-[6px] border-b-[#25D366] p-8 text-center select-none">
+        <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366]">
+          <MessageSquare className="h-10 w-10 fill-[#25D366]" />
         </div>
-        <h3 className="mt-4 text-sm font-medium text-muted-foreground">
-          {t("selectConversation")}
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {t("selectConversationHint")}
+        <h2 className="text-2xl font-light tracking-tight text-foreground sm:text-3xl">
+          WhatsApp Business Web
+        </h2>
+        <p className="mt-3 max-w-md text-sm text-muted-foreground leading-relaxed">
+          Send and receive WhatsApp messages, manage leads, automate customer replies, and run broadcasts directly from your CRM.
         </p>
+        <div className="mt-12 flex items-center gap-1.5 text-xs text-muted-foreground/80">
+          <span className="text-xs">🔒</span>
+          <span>End-to-end encrypted</span>
+        </div>
       </div>
     );
   }

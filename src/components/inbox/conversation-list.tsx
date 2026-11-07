@@ -227,80 +227,90 @@ export function ConversationList({
     // the single pane showing; fixed 320px on desktop where it shares the
     // row with the thread + contact sidebar.
     <div className="flex h-full w-full flex-col border-r border-border bg-card lg:w-80">
-      {/* Search + Filter */}
-      <div className="space-y-2 border-b border-border p-3">
+      {/* WhatsApp-style Header & Search Bar */}
+      <div className="border-b border-border/60 bg-[var(--wa-header-bg)] p-3 space-y-2.5">
+        <div className="flex items-center justify-between px-1">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
+            {t("title") || "Chats"}
+          </h1>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setFilter(filter === "unread" ? "all" : "unread")}
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                filter === "unread"
+                  ? "bg-[#25D366] text-white"
+                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+              )}
+              title={t("filterUnread")}
+            >
+              <span className="text-xs font-bold">@</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Search Input */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={handleSearchChange}
             placeholder={t("searchPlaceholder")}
-            className="border-border bg-muted pl-9 text-sm text-foreground placeholder-muted-foreground focus:border-primary/50"
+            className="h-9 rounded-lg border-none bg-[var(--wa-search-bg)] pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-[#00a884]"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center justify-center h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted">
-                {activeFilter?.label ?? t("filterAll")}
-                <ChevronDown className="h-3 w-3" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="border-border bg-popover"
-            >
-              {FILTER_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onClick={() => setFilter(opt.value)}
-                  className={cn(
-                    "text-sm",
-                    filter === opt.value
-                      ? "text-primary"
-                      : "text-popover-foreground"
-                  )}
-                >
-                  {opt.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Horizontal Filter Pill Chips — Signature WhatsApp Business Style */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          {FILTER_OPTIONS.slice(0, 5).map((opt) => {
+            const isSelected = filter === opt.value;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => setFilter(opt.value)}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors select-none",
+                  isSelected
+                    ? "bg-[#00a884]/20 text-[#00a884] dark:bg-[#00a884]/30 dark:text-[#25D366] font-semibold"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
 
           {tags.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={cn(
-                  "inline-flex items-center justify-center h-7 gap-1 px-2 text-xs rounded-md hover:bg-muted",
-                  selectedTagIds.length > 0
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                  "shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-muted/60 text-muted-foreground hover:text-foreground",
+                  selectedTagIds.length > 0 && "bg-[#00a884]/20 text-[#00a884] font-semibold"
                 )}
               >
                 {t("tags")}
                 {selectedTagIds.length > 0 && (
-                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                  <span className="flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#25D366] px-1 text-[9px] font-bold text-white">
                     {selectedTagIds.length}
                   </span>
                 )}
                 <ChevronDown className="h-3 w-3" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="max-h-64 w-56 border-border bg-popover"
-              >
-                {tags.map((t) => (
+              <DropdownMenuContent align="start" className="max-h-64 w-56 border-border bg-popover">
+                {tags.map((tg) => (
                   <DropdownMenuCheckboxItem
-                    key={t.id}
-                    checked={selectedTagIds.includes(t.id)}
-                    onCheckedChange={() => toggleTag(t.id)}
+                    key={tg.id}
+                    checked={selectedTagIds.includes(tg.id)}
+                    onCheckedChange={() => toggleTag(tg.id)}
                     className="text-sm text-popover-foreground"
                   >
                     <span className="flex items-center gap-2">
                       <span
                         className="h-2 w-2 shrink-0 rounded-full"
-                        style={{ backgroundColor: t.color }}
+                        style={{ backgroundColor: tg.color }}
                       />
-                      <span className="truncate">{t.name}</span>
+                      <span className="truncate">{tg.name}</span>
                     </span>
                   </DropdownMenuCheckboxItem>
                 ))}
@@ -312,27 +322,17 @@ export function ConversationList({
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={cn(
-                  "inline-flex max-w-40 items-center justify-center h-7 gap-1 px-2 text-xs rounded-md hover:bg-muted",
-                  selectedCompany
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                  "shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-muted/60 text-muted-foreground hover:text-foreground",
+                  selectedCompany && "bg-[#00a884]/20 text-[#00a884] font-semibold"
                 )}
               >
-                <span className="truncate">{selectedCompany ?? t("company")}</span>
+                <span className="truncate max-w-20">{selectedCompany ?? t("company")}</span>
                 <ChevronDown className="h-3 w-3 shrink-0" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="max-h-64 w-56 border-border bg-popover"
-              >
+              <DropdownMenuContent align="start" className="max-h-64 w-56 border-border bg-popover">
                 <DropdownMenuItem
                   onClick={() => setSelectedCompany(null)}
-                  className={cn(
-                    "text-sm",
-                    selectedCompany === null
-                      ? "text-primary"
-                      : "text-popover-foreground"
-                  )}
+                  className="text-sm text-popover-foreground"
                 >
                   {t("allCompanies")}
                 </DropdownMenuItem>
@@ -340,12 +340,7 @@ export function ConversationList({
                   <DropdownMenuItem
                     key={co}
                     onClick={() => setSelectedCompany(co)}
-                    className={cn(
-                      "text-sm",
-                      selectedCompany === co
-                        ? "text-primary"
-                        : "text-popover-foreground"
-                    )}
+                    className="text-sm text-popover-foreground"
                   >
                     <span className="truncate">{co}</span>
                   </DropdownMenuItem>
@@ -457,34 +452,34 @@ function ConversationItem({
     <button
       onClick={handleClick}
       className={cn(
-        "flex w-full items-start gap-3 px-3.5 py-3 text-left transition-colors border-b border-border/30 hover:bg-muted/60",
+        "flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors border-b border-border/40 hover:bg-[#202c33]/40 dark:hover:bg-[#202c33]/70",
         isActive
-          ? "border-l-4 border-l-[#00a884] bg-muted/80 dark:bg-[#202c33]"
+          ? "bg-[#2a3942]/60 dark:bg-[#202c33] border-l-4 border-l-[#25D366]"
           : "border-l-4 border-l-transparent"
       )}
     >
       {/* Avatar */}
-      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground ring-1 ring-border/50">
+      <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#6b7b84]/20 text-[#8696a0] text-base font-semibold ring-1 ring-border/30">
         {contact?.avatar_url ? (
           <img
             src={contact.avatar_url}
             alt={displayName}
-            className="h-11 w-11 rounded-full object-cover"
+            className="h-12 w-12 rounded-full object-cover"
           />
         ) : (
-          initials
+          <span className="text-foreground/90 font-medium">{initials}</span>
         )}
       </div>
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-sm font-semibold text-foreground">
+        <div className="flex items-center justify-between gap-1">
+          <span className="truncate text-[15px] font-medium text-foreground tracking-tight">
             {displayName}
           </span>
           <span
             className={cn(
-              "shrink-0 text-[11px]",
+              "shrink-0 text-[11.5px]",
               conversation.unread_count > 0
                 ? "font-semibold text-[#00a884] dark:text-[#25D366]"
                 : "text-muted-foreground"
@@ -493,8 +488,8 @@ function ConversationItem({
             {timeAgo}
           </span>
         </div>
-        <div className="mt-1 flex items-center justify-between gap-2">
-          <p className="truncate text-xs text-muted-foreground">
+        <div className="mt-0.5 flex items-center justify-between gap-2">
+          <p className="truncate text-[13px] text-muted-foreground leading-snug">
             {conversation.last_message_text || t("noMessagesYet")}
           </p>
           <div className="flex shrink-0 items-center gap-1.5">
